@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=UserWarning)
@@ -23,7 +22,7 @@ def run_gaitpy(src, sample_rate, subject_height, dst):
                     flip=False)
 
     #### Classify bouts of gait ####
-    gait_bouts = gaitpy.classify_bouts(result_file=os.path.join(dst,'classify_bouts.h5'))
+    gait_bouts = gaitpy.classify_bouts()
 
     #### Extract gait characteristics ####
     gait_features = gaitpy.extract_features(subject_height,
@@ -55,17 +54,6 @@ def run_demo():
         print("Error processing: {}\nError: {}".format(src, e))
     stp = time.time()
     print("total run time: {} seconds".format(round(stp-st, 2)))
-
-    # Confirm expected results
-    print("Checking extract_features endpoints...")
-    expected_gait_features = pd.read_csv(__file__.split(".py")[0] + '_gait_features.csv')
-    obtained_gait_features = pd.read_csv(os.path.join(dst, 'gait_features.csv'))
-    assert_frame_equal(expected_gait_features, obtained_gait_features)
-    print("Checking classify_bouts endpoints...")
-    expected_classify_bouts = pd.read_hdf(__file__.split(".py")[0] + '_classify_bouts.h5')
-    obtained_classify_bouts = pd.read_hdf(os.path.join(dst, 'classify_bouts.h5'))
-    assert_frame_equal(expected_classify_bouts, obtained_classify_bouts)
-    print("All tests passed")
 
 if __name__ == "__main__":
     run_demo()

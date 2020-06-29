@@ -135,7 +135,7 @@ class Gaitpy():
         for row_n, bout in gait_bouts.iterrows():
             bout_indices = (timestamps.astype('datetime64[ms]') >= bout.start_time) & (timestamps.astype('datetime64[ms]') <= bout.end_time)
             bout_data = pd.DataFrame([])
-            bout_data['y'] = pd.DataFrame(y_accel.loc[bout_indices].reset_index(drop=True))
+            bout_data['y'] = y_accel.loc[bout_indices].reset_index(drop=True)
             bout_data['ts'] = timestamps.loc[bout_indices].reset_index(drop=True)
             if len(bout_data.y) <= 15:
                 warnings.warn('There are too few data points between '+str(bout.start_time)+' and '+str(bout.end_time)+', skipping bout...')
@@ -324,13 +324,8 @@ class Gaitpy():
 
         print('\tPlot complete!\n')
 
-    def classify_bouts(self, result_file=None):
+    def classify_bouts(self):
         """ Gait bout classification using acceleration data in the vertical direction from the lumbar location.
-
-        Parameters:
-            result_file: str
-                Optional argument that accepts .h5 filepath string to save resulting predictions to.
-                None by default. (ie. myfolder/myfile.h5)
 
         Returns:
             pandas.core.frame.DataFrame
@@ -340,7 +335,6 @@ class Gaitpy():
         import pickle
         import pandas as pd
         import os
-        import deepdish as dd
         import gaitpy.util as util
 
         print('\tClassifying bouts of gait...')
@@ -370,19 +364,6 @@ class Gaitpy():
         except:
             print('Unable to make predictions from signal features, aborting...')
             return
-
-        # Save predictions to hdf file
-        if result_file:
-            try:
-                if not result_file.endswith('.h5'):
-                    result_file += '.h5'
-                predictions_dict = {}
-                predictions_dict['predictions'] = predictions_df
-
-                dd.io.save(result_file, predictions_dict)
-            except:
-                print('Unable to save data: Please make sure your results directory exists, aborting...')
-                return
 
         print('\tBout classification complete!\n')
 
